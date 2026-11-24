@@ -1,0 +1,848 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>GameZone - Loja de Jogos</title>
+
+  <!-- ============================================================
+       1) CSS - ESTILOS VISUAIS DO SITE
+       Aqui fica tudo relacionado à aparência:
+       cores, tamanhos, layout, botões, tabelas, etc.
+  ============================================================ -->
+  <style>
+:root {
+  --papel: #0f1117;
+  --superficie: #1a1d27;
+  --tinta: #e8eaf0;
+  --apoio: #8b92a8;
+  --linha: #2a2e3d;
+  --campo: #3d4458;
+  --destaque: #6c5ce7;
+  --destaque-forte: #5a4bd1;
+  --realce: #2d2654;
+  --perigo: #e74c3c;
+  --sucesso: #00b894;
+  --fonte: system-ui, -apple-system, "Segoe UI", sans-serif;
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font: 1rem/1.6 var(--fonte);
+  color: var(--tinta);
+  background: var(--papel);
+}
+h1, h2 { font-weight: 700; line-height: 1.2; }
+h1 { font-size: 2rem; margin: 0 0 .25rem; }
+a { color: var(--destaque); cursor: pointer; }
+:focus-visible { outline: 3px solid var(--destaque); outline-offset: 2px; }
+.apoio { color: var(--apoio); }
+
+/* ---- TOPO / MENU ---- */
+.topo {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: .75rem 2rem;
+  padding: .9rem clamp(1rem, 4vw, 2.5rem);
+  background: var(--superficie);
+  border-bottom: 1px solid var(--linha);
+}
+.marca {
+  font-size: 1.5rem;
+  font-weight: 800;
+  color: var(--tinta);
+  text-decoration: none;
+  cursor: pointer;
+  letter-spacing: -0.5px;
+}
+.marca span { color: var(--destaque); }
+.topo nav { display: flex; flex-wrap: wrap; align-items: center; gap: .5rem 1.25rem; }
+.topo nav a { text-decoration: none; cursor: pointer; color: var(--apoio); }
+.topo nav a:hover { color: var(--tinta); }
+
+main { max-width: 72rem; margin: 0 auto; padding: 2rem clamp(1rem, 4vw, 2.5rem) 4rem; }
+
+.aviso {
+  max-width: 40rem;
+  margin: 0 0 1.5rem;
+  padding: .7rem 1rem;
+  background: var(--realce);
+  border-left: 4px solid var(--destaque);
+  border-radius: 0 6px 6px 0;
+}
+
+/* ---- BOTÕES ---- */
+button, .botao {
+  display: inline-block;
+  font: inherit;
+  font-weight: 600;
+  padding: .6rem 1.1rem;
+  border: 0;
+  border-radius: 6px;
+  background: var(--destaque);
+  color: #fff;
+  text-align: center;
+  text-decoration: none;
+  cursor: pointer;
+}
+button:hover, .botao:hover { background: var(--destaque-forte); }
+button.link {
+  padding: 0;
+  background: none;
+  color: var(--destaque);
+  font-weight: 400;
+  text-decoration: underline;
+}
+button.link:hover { background: none; color: var(--destaque-forte); }
+button.link.perigo { color: var(--perigo); }
+
+/* ---- GRADE DE JOGOS ---- */
+.subtitulo { margin: 0 0 2rem; color: var(--apoio); }
+.grade {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  gap: 1.5rem;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.card-jogo {
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+  border-radius: 10px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+}
+.capa-jogo {
+  aspect-ratio: 16 / 9;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 2.5rem;
+  background: linear-gradient(135deg, hsl(var(--h) 50% 25%), hsl(var(--h) 40% 15%));
+  color: #fff;
+}
+.info-jogo {
+  padding: 1rem;
+  display: grid;
+  gap: .35rem;
+  flex: 1;
+}
+.info-jogo h2 { margin: 0; font-size: 1.05rem; }
+.info-jogo .plataforma { font-size: .8rem; color: var(--apoio); }
+.info-jogo .descricao {
+  font-size: .85rem;
+  color: var(--apoio);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.info-jogo .preco { font-size: 1.15rem; font-weight: 700; color: var(--sucesso); margin-top: .25rem; }
+.info-jogo button { width: 100%; margin-top: .5rem; }
+.esgotado { font-weight: 600; color: var(--perigo); margin-top: .5rem; }
+
+/* ---- LISTAS (carrinho / pedidos) ---- */
+.linhas { list-style: none; margin: 1.5rem 0; padding: 0; border-top: 1px solid var(--linha); }
+.linhas li {
+  display: grid;
+  grid-template-columns: 1fr auto auto auto;
+  gap: .5rem 1.5rem;
+  align-items: center;
+  padding: .9rem 0;
+  border-bottom: 1px solid var(--linha);
+}
+.linhas.simples li { grid-template-columns: 1fr auto; }
+.linhas strong { display: block; }
+.valor { min-width: 6rem; font-weight: 600; text-align: right; }
+.total { font-size: 1.25rem; margin: 0 0 1.75rem; }
+
+.pedido {
+  max-width: 44rem;
+  margin: 0 0 1.5rem;
+  padding: 1.25rem 1.5rem 0;
+  background: var(--superficie);
+  border: 1px solid var(--linha);
+  border-radius: 8px;
+}
+.pedido h2 { margin: 0; font-size: 1.2rem; }
+.pedido p { margin: 0; }
+.pedido .total { padding-bottom: 1.25rem; }
+
+/* ---- FORMULÁRIOS ---- */
+.campos { display: grid; gap: 1rem; max-width: 26rem; margin: 1.5rem 0; }
+.campos.larga { max-width: 36rem; }
+label { display: grid; gap: .3rem; font-weight: 600; }
+input, textarea, select {
+  font: inherit;
+  font-weight: 400;
+  padding: .55rem .65rem;
+  color: var(--tinta);
+  background: var(--papel);
+  border: 1px solid var(--campo);
+  border-radius: 6px;
+}
+.dupla { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+label.marcar { display: flex; align-items: center; gap: .6rem; font-weight: 400; }
+label.marcar input { width: 1.1rem; height: 1.1rem; }
+.botoes { display: flex; align-items: center; gap: 1.25rem; }
+
+/* ---- ADMIN ---- */
+.titulo-linha {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+.titulo-linha h1 { margin: 0; }
+.rolagem { overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; background: var(--superficie); border-radius: 8px; overflow: hidden; }
+th, td { padding: .7rem 1rem; text-align: left; border-bottom: 1px solid var(--linha); }
+th { font-size: .85rem; color: var(--apoio); font-weight: 600; }
+.acoes { display: flex; align-items: center; gap: 1rem; }
+.hidden { display: none !important; }
+
+@media (max-width: 40rem) {
+  .linhas li { grid-template-columns: 1fr auto; }
+  h1 { font-size: 1.6rem; }
+  .grade { grid-template-columns: 1fr 1fr; gap: 1rem; }
+}
+  </style>
+</head>
+<body>
+
+  <!-- ============================================================
+       2) HTML - ESTRUTURA DAS PÁGINAS
+       Cada <section> é uma "página" do site.
+       Só uma fica visível por vez (controlado pelo JavaScript).
+  ============================================================ -->
+
+  <header class="topo">
+    <a class="marca" onclick="ir('index')">Game<span>Zone</span></a>
+    <nav id="nav"></nav>
+  </header>
+
+  <main>
+    <p id="flash" class="aviso hidden" role="status"></p>
+
+    <!-- PÁGINA: CATÁLOGO -->
+    <section id="page-index">
+      <h1>Jogos</h1>
+      <p class="subtitulo" id="subtitulo"></p>
+      <ul class="grade" id="grade-jogos"></ul>
+    </section>
+
+    <!-- PÁGINA: CARRINHO -->
+    <section id="page-carrinho" class="hidden">
+      <h1>Carrinho</h1>
+      <div id="conteudo-carrinho"></div>
+    </section>
+
+    <!-- PÁGINA: LOGIN / CADASTRO -->
+    <section id="page-auth" class="hidden">
+      <h1 id="titulo-auth">Entrar</h1>
+      <form id="form-auth" class="campos"></form>
+      <p id="extra-auth"></p>
+    </section>
+
+    <!-- PÁGINA: PEDIDOS -->
+    <section id="page-pedidos" class="hidden">
+      <h1>Meus pedidos</h1>
+      <div id="lista-pedidos"></div>
+    </section>
+
+    <!-- PÁGINA: ADMIN -->
+    <section id="page-admin" class="hidden">
+      <div class="titulo-linha">
+        <h1>Administração</h1>
+        <a class="botao" onclick="ir('jogo_form')">Novo jogo</a>
+      </div>
+      <div class="rolagem">
+        <table>
+          <thead>
+            <tr>
+              <th>Título</th><th>Plataforma</th><th>Preço</th><th>Estoque</th><th>Situação</th><th></th>
+            </tr>
+          </thead>
+          <tbody id="tabela-jogos"></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- PÁGINA: FORMULÁRIO DE JOGO -->
+    <section id="page-jogo_form" class="hidden">
+      <h1 id="titulo-form">Novo jogo</h1>
+      <form id="form-jogo" class="campos larga">
+        <label>Título
+          <input name="titulo" maxlength="150" required>
+        </label>
+        <label>Plataforma
+          <input name="plataforma" maxlength="50" placeholder="PC, PS5, Xbox, Switch..." required>
+        </label>
+        <label>Gênero
+          <input name="genero" maxlength="50" placeholder="Ação, RPG, Esportes...">
+        </label>
+        <label>Descrição
+          <textarea name="descricao" rows="3" maxlength="500"></textarea>
+        </label>
+        <div class="dupla">
+          <label>Preço (R$)
+            <input name="preco" inputmode="decimal" required>
+          </label>
+          <label>Estoque
+            <input type="number" name="estoque" min="0" required>
+          </label>
+        </div>
+        <label class="marcar">
+          <input type="checkbox" name="ativo" checked>
+          À venda no catálogo
+        </label>
+        <div class="botoes">
+          <button type="submit">Salvar</button>
+          <a onclick="ir('admin')">Cancelar</a>
+        </div>
+      </form>
+    </section>
+  </main>
+
+<script>
+/* ============================================================
+   3) JAVASCRIPT - LÓGICA DO SITE
+============================================================ */
+
+
+/* ------------------------------------------------------------
+   3.1) DADOS INICIAIS DOS JOGOS
+   Altere, adicione ou remova jogos aqui.
+------------------------------------------------------------ */
+const JOGOS_INICIAIS = [
+  { id: 1, titulo: "The Legend of Zelda: Tears of the Kingdom", plataforma: "Nintendo Switch", genero: "Aventura", descricao: "Explore Hyrule pelo céu, terra e subterrâneo nesta sequência épica.", preco: 349.90, estoque: 20, ativo: 1 },
+  { id: 2, titulo: "Elden Ring", plataforma: "PC / PS5 / Xbox", genero: "RPG de Ação", descricao: "Um mundo aberto sombrio criado por FromSoftware e George R. R. Martin.", preco: 249.90, estoque: 15, ativo: 1 },
+  { id: 3, titulo: "God of War Ragnarök", plataforma: "PS5 / PS4", genero: "Ação", descricao: "Kratos e Atreus enfrentam o fim dos tempos na mitologia nórdica.", preco: 299.90, estoque: 12, ativo: 1 },
+  { id: 4, titulo: "FIFA 25", plataforma: "PC / PS5 / Xbox", genero: "Esportes", descricao: "O maior jogo de futebol do mundo com gráficos e jogabilidade aprimorados.", preco: 349.90, estoque: 30, ativo: 1 },
+  { id: 5, titulo: "Minecraft", plataforma: "Multiplataforma", genero: "Sandbox", descricao: "Construa, explore e sobreviva em um mundo feito de blocos.", preco: 89.90, estoque: 50, ativo: 1 },
+  { id: 6, titulo: "Grand Theft Auto V", plataforma: "PC / PS5 / Xbox", genero: "Ação", descricao: "Três criminosos em Los Santos numa história cinematográfica.", preco: 99.90, estoque: 25, ativo: 1 },
+  { id: 7, titulo: "Red Dead Redemption 2", plataforma: "PC / PS4 / Xbox", genero: "Aventura", descricao: "A vida de um fora-da-lei no Velho Oeste americano.", preco: 199.90, estoque: 18, ativo: 1 },
+  { id: 8, titulo: "Cyberpunk 2077", plataforma: "PC / PS5 / Xbox", genero: "RPG", descricao: "Um RPG de mundo aberto ambientado em Night City.", preco: 149.90, estoque: 22, ativo: 1 }
+];
+
+
+/* ------------------------------------------------------------
+   3.2) ARMAZENAMENTO (localStorage)
+------------------------------------------------------------ */
+function get(chave, padrao) {
+  const v = localStorage.getItem(chave);
+  return v ? JSON.parse(v) : padrao;
+}
+function set(chave, valor) {
+  localStorage.setItem(chave, JSON.stringify(valor));
+}
+function getJogos() {
+  let jogos = get("jogos", null);
+  if (!jogos) { jogos = JOGOS_INICIAIS; set("jogos", jogos); }
+  return jogos;
+}
+function salvarJogos(jogos) { set("jogos", jogos); }
+function getUsuarios() {
+  let usuarios = get("usuarios", null);
+  if (!usuarios) {
+    usuarios = [{ id: 1, nome: "Administrador", email: "admin@gamezone.com", senha: "123456789", papel: "admin" }];
+    set("usuarios", usuarios);
+  }
+  return usuarios;
+}
+function salvarUsuarios(u) { set("usuarios", u); }
+function getUsuarioLogado() {
+  const id = localStorage.getItem("usuario_id");
+  if (!id) return null;
+  return getUsuarios().find(u => u.id === Number(id)) || null;
+}
+function getCarrinho() { return get("carrinho", {}); }
+function salvarCarrinho(c) { set("carrinho", c); }
+function getPedidos() { return get("pedidos", []); }
+function salvarPedidos(p) { set("pedidos", p); }
+
+
+/* ------------------------------------------------------------
+   3.3) FUNÇÕES AUXILIARES
+------------------------------------------------------------ */
+function brl(valor) {
+  const texto = Number(valor).toFixed(2).replace(".", ",").replace(/\B(?=(\d{3})+(?!\d))/g, ".");
+  return "R$ " + texto;
+}
+function dataBR(iso) {
+  if (!iso) return "";
+  const [ano, mes, dia] = iso.slice(0, 10).split("-");
+  return `${dia}/${mes}/${ano}`;
+}
+function esc(str) {
+  const d = document.createElement("div");
+  d.textContent = str ?? "";
+  return d.innerHTML;
+}
+let flashMsg = null;
+function flash(msg) { flashMsg = msg; }
+function mostrarFlash() {
+  const el = document.getElementById("flash");
+  if (flashMsg) {
+    el.textContent = flashMsg;
+    el.classList.remove("hidden");
+    flashMsg = null;
+  } else {
+    el.classList.add("hidden");
+  }
+}
+
+
+/* ------------------------------------------------------------
+   3.4) MENU E NAVEGAÇÃO
+------------------------------------------------------------ */
+function qtdCarrinho() {
+  return Object.values(getCarrinho()).reduce((a, b) => a + b, 0);
+}
+function montarTopo() {
+  const user = getUsuarioLogado();
+  const qtd = qtdCarrinho();
+  const nav = document.getElementById("nav");
+  let html = `<a onclick="ir('carrinho')">Carrinho${qtd ? ` (${qtd})` : ""}</a>`;
+  if (user) {
+    html += `<a onclick="ir('pedidos')">Meus pedidos</a>`;
+    if (user.papel === "admin") html += `<a onclick="ir('admin')">Administração</a>`;
+    html += `<button type="button" class="link" onclick="sair()">Sair (${esc(user.nome)})</button>`;
+  } else {
+    html += `<a onclick="ir('auth', {tipo:'login'})">Entrar</a>`;
+    html += `<a class="botao" onclick="ir('auth', {tipo:'cadastro'})">Criar conta</a>`;
+  }
+  nav.innerHTML = html;
+}
+function sair() {
+  localStorage.removeItem("usuario_id");
+  flash("Você saiu da conta.");
+  ir("index");
+}
+function esconderTodas() {
+  document.querySelectorAll("main > section").forEach(s => s.classList.add("hidden"));
+}
+function ir(pagina, params = {}) {
+  esconderTodas();
+  montarTopo();
+  mostrarFlash();
+  document.getElementById("page-" + pagina).classList.remove("hidden");
+  if (pagina === "index")     renderIndex();
+  if (pagina === "carrinho")  renderCarrinho();
+  if (pagina === "auth")      renderAuth(params.tipo || "login");
+  if (pagina === "pedidos")   renderPedidos();
+  if (pagina === "admin")     renderAdmin();
+  if (pagina === "jogo_form") renderJogoForm(params.id || null);
+  window.scrollTo(0, 0);
+}
+
+
+/* ------------------------------------------------------------
+   3.5) CATÁLOGO DE JOGOS
+------------------------------------------------------------ */
+function renderIndex() {
+  const jogos = getJogos().filter(j => j.ativo);
+  document.getElementById("subtitulo").textContent = `${jogos.length} jogos disponíveis.`;
+  const lista = document.getElementById("grade-jogos");
+  if (!jogos.length) {
+    lista.innerHTML = "<p>Nenhum jogo à venda no momento.</p>";
+    return;
+  }
+  const emoji = (g) => {
+    if (!g) return "🎮";
+    g = g.toLowerCase();
+    if (g.includes("rpg")) return "⚔️";
+    if (g.includes("esporte")) return "⚽";
+    if (g.includes("aventura")) return "🗺️";
+    if (g.includes("ação") || g.includes("acao")) return "💥";
+    if (g.includes("sandbox")) return "🧱";
+    return "🎮";
+  };
+  lista.innerHTML = jogos.map(jogo => `
+    <li class="card-jogo">
+      <div class="capa-jogo" style="--h: ${(jogo.id * 47) % 360}">${emoji(jogo.genero)}</div>
+      <div class="info-jogo">
+        <h2>${esc(jogo.titulo)}</h2>
+        <p class="plataforma">${esc(jogo.plataforma)}${jogo.genero ? " · " + esc(jogo.genero) : ""}</p>
+        ${jogo.descricao ? `<p class="descricao">${esc(jogo.descricao)}</p>` : ""}
+        <p class="preco">${brl(jogo.preco)}</p>
+        ${jogo.estoque > 0
+          ? `<button type="button" onclick="adicionarCarrinho(${jogo.id})">Adicionar ao carrinho</button>`
+          : `<p class="esgotado">Esgotado</p>`}
+      </div>
+    </li>
+  `).join("");
+}
+function adicionarCarrinho(id) {
+  const jogos = getJogos();
+  const jogo = jogos.find(j => j.id === id && j.ativo);
+  if (!jogo) return;
+  const cesta = getCarrinho();
+  const qtd = (cesta[id] || 0) + 1;
+  if (qtd > jogo.estoque) {
+    flash("Não há mais unidades em estoque.");
+  } else {
+    cesta[id] = qtd;
+    salvarCarrinho(cesta);
+    flash("Jogo adicionado ao carrinho.");
+  }
+  ir("index");
+}
+
+
+/* ------------------------------------------------------------
+   3.6) CARRINHO
+------------------------------------------------------------ */
+function renderCarrinho() {
+  const cesta = getCarrinho();
+  const jogos = getJogos();
+  const itens = [];
+  let total = 0;
+  for (const [id, qtd] of Object.entries(cesta)) {
+    const jogo = jogos.find(j => j.id === Number(id) && j.ativo);
+    if (jogo) {
+      const subtotal = Math.round(jogo.preco * qtd * 100) / 100;
+      itens.push({ jogo, quantidade: qtd, subtotal });
+      total += subtotal;
+    }
+  }
+  total = Math.round(total * 100) / 100;
+  const area = document.getElementById("conteudo-carrinho");
+  if (!itens.length) {
+    area.innerHTML = `<p>Seu carrinho está vazio. <a onclick="ir('index')">Ver os jogos</a></p>`;
+    return;
+  }
+  let html = `<ul class="linhas">`;
+  for (const item of itens) {
+    html += `
+      <li>
+        <div>
+          <strong>${esc(item.jogo.titulo)}</strong>
+          <span class="apoio">${esc(item.jogo.plataforma)}</span>
+        </div>
+        <span>${item.quantidade} × ${brl(item.jogo.preco)}</span>
+        <span class="valor">${brl(item.subtotal)}</span>
+        <button type="button" class="link" onclick="removerCarrinho(${item.jogo.id})">Remover</button>
+      </li>`;
+  }
+  html += `</ul><p class="total">Total: <strong>${brl(total)}</strong></p>`;
+  const user = getUsuarioLogado();
+  if (user) {
+    html += `
+      <form class="campos" onsubmit="finalizarPedido(event)">
+        <label>Endereço de entrega / e-mail para chave digital
+          <input name="endereco" maxlength="255" required>
+        </label>
+        <button type="submit">Finalizar compra</button>
+      </form>
+      <p class="apoio">Pagamento simulado. Ao finalizar, o pedido aparece como pago.</p>`;
+  } else {
+    html += `<p>Para finalizar, <a onclick="ir('auth',{tipo:'login'})">entre na sua conta</a> ou <a onclick="ir('auth',{tipo:'cadastro'})">crie uma</a>.</p>`;
+  }
+  area.innerHTML = html;
+}
+function removerCarrinho(id) {
+  const cesta = getCarrinho();
+  delete cesta[id];
+  salvarCarrinho(cesta);
+  ir("carrinho");
+}
+function finalizarPedido(e) {
+  e.preventDefault();
+  const user = getUsuarioLogado();
+  if (!user) return;
+  const endereco = e.target.endereco.value.trim();
+  if (!endereco) {
+    flash("Informe o endereço ou e-mail.");
+    ir("carrinho");
+    return;
+  }
+  const cesta = getCarrinho();
+  const jogos = getJogos();
+  const itens = [];
+  let total = 0;
+  for (const [id, qtd] of Object.entries(cesta)) {
+    const jogo = jogos.find(j => j.id === Number(id) && j.ativo);
+    if (jogo) {
+      if (qtd > jogo.estoque) {
+        flash("Algum jogo ficou sem estoque. Confira o carrinho.");
+        ir("carrinho");
+        return;
+      }
+      itens.push({ jogo, quantidade: qtd });
+      total += jogo.preco * qtd;
+    }
+  }
+  total = Math.round(total * 100) / 100;
+  if (!itens.length) {
+    flash("Seu carrinho está vazio.");
+    ir("carrinho");
+    return;
+  }
+  for (const item of itens) {
+    const idx = jogos.findIndex(j => j.id === item.jogo.id);
+    jogos[idx].estoque -= item.quantidade;
+  }
+  salvarJogos(jogos);
+  const pedidos = getPedidos();
+  const novoId = pedidos.length ? Math.max(...pedidos.map(p => p.id)) + 1 : 1;
+  const agora = new Date().toISOString().slice(0, 19).replace("T", " ");
+  pedidos.push({
+    id: novoId,
+    usuario_id: user.id,
+    total,
+    endereco,
+    status: "pago",
+    criado_em: agora,
+    itens: itens.map(i => ({
+      jogo_id: i.jogo.id,
+      titulo: i.jogo.titulo,
+      quantidade: i.quantidade,
+      preco_unitario: i.jogo.preco
+    }))
+  });
+  salvarPedidos(pedidos);
+  salvarCarrinho({});
+  flash("Pedido realizado! Obrigado pela compra.");
+  ir("pedidos");
+}
+
+
+/* ------------------------------------------------------------
+   3.7) MEUS PEDIDOS
+------------------------------------------------------------ */
+function renderPedidos() {
+  const user = getUsuarioLogado();
+  if (!user) {
+    flash("Entre na sua conta para continuar.");
+    ir("auth", { tipo: "login" });
+    return;
+  }
+  const pedidos = getPedidos().filter(p => p.usuario_id === user.id).reverse();
+  const area = document.getElementById("lista-pedidos");
+  if (!pedidos.length) {
+    area.innerHTML = `<p>Você ainda não fez nenhum pedido. <a onclick="ir('index')">Ver os jogos</a></p>`;
+    return;
+  }
+  area.innerHTML = pedidos.map(p => `
+    <section class="pedido">
+      <h2>Pedido #${p.id}</h2>
+      <p class="apoio">${dataBR(p.criado_em)} · ${p.status}</p>
+      <ul class="linhas simples">
+        ${p.itens.map(i => `
+          <li>
+            <span>${esc(i.titulo)}</span>
+            <span>${i.quantidade} × ${brl(i.preco_unitario)}</span>
+          </li>
+        `).join("")}
+      </ul>
+      <p class="total">Total: <strong>${brl(p.total)}</strong></p>
+    </section>
+  `).join("");
+}
+
+
+/* ------------------------------------------------------------
+   3.8) LOGIN E CADASTRO
+------------------------------------------------------------ */
+function renderAuth(tipo) {
+  const titulo = tipo === "cadastro" ? "Criar conta" : "Entrar";
+  document.getElementById("titulo-auth").textContent = titulo;
+  const form = document.getElementById("form-auth");
+  form.innerHTML = "";
+  if (tipo === "cadastro") {
+    form.innerHTML += `<label>Nome<input name="nome" maxlength="100" required></label>`;
+  }
+  form.innerHTML += `<label>E-mail<input type="email" name="email" maxlength="150" required></label>`;
+  if (tipo === "cadastro") {
+    form.innerHTML += `<label>Senha (mínimo 8 caracteres)<input type="password" name="senha" minlength="8" required></label>`;
+  } else {
+    form.innerHTML += `<label>Senha<input type="password" name="senha" required></label>`;
+  }
+  form.innerHTML += `<button type="submit">${titulo}</button>`;
+  const extra = document.getElementById("extra-auth");
+  if (tipo === "cadastro") {
+    extra.innerHTML = `Já tem conta? <a onclick="ir('auth',{tipo:'login'})">Entrar</a>`;
+  } else {
+    extra.innerHTML = `Ainda não tem conta? <a onclick="ir('auth',{tipo:'cadastro'})">Criar conta</a>`;
+  }
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    if (tipo === "cadastro") cadastrar(fd);
+    else logar(fd);
+  };
+}
+function cadastrar(fd) {
+  const nome = (fd.get("nome") || "").trim();
+  const email = (fd.get("email") || "").trim().toLowerCase();
+  const senha = fd.get("senha") || "";
+  if (!nome || !email.includes("@")) {
+    flash("Informe seu nome e um e-mail válido.");
+    ir("auth", { tipo: "cadastro" });
+    return;
+  }
+  if (senha.length < 8) {
+    flash("A senha precisa ter pelo menos 8 caracteres.");
+    ir("auth", { tipo: "cadastro" });
+    return;
+  }
+  const usuarios = getUsuarios();
+  if (usuarios.some(u => u.email === email)) {
+    flash("Já existe uma conta com esse e-mail.");
+    ir("auth", { tipo: "cadastro" });
+    return;
+  }
+  const novoId = usuarios.length ? Math.max(...usuarios.map(u => u.id)) + 1 : 1;
+  usuarios.push({ id: novoId, nome, email, senha, papel: "cliente" });
+  salvarUsuarios(usuarios);
+  flash("Conta criada! Agora é só entrar.");
+  ir("auth", { tipo: "login" });
+}
+function logar(fd) {
+  const email = (fd.get("email") || "").trim().toLowerCase();
+  const senha = fd.get("senha") || "";
+  const usuario = getUsuarios().find(u => u.email === email && u.senha === senha);
+  if (usuario) {
+    localStorage.setItem("usuario_id", usuario.id);
+    ir("index");
+  } else {
+    flash("E-mail ou senha incorretos.");
+    ir("auth", { tipo: "login" });
+  }
+}
+
+
+/* ------------------------------------------------------------
+   3.9) ADMIN
+------------------------------------------------------------ */
+function renderAdmin() {
+  const user = getUsuarioLogado();
+  if (!user || user.papel !== "admin") {
+    flash("Acesso restrito a administradores.");
+    ir("index");
+    return;
+  }
+  const jogos = getJogos().slice().sort((a, b) => a.titulo.localeCompare(b.titulo));
+  document.getElementById("tabela-jogos").innerHTML = jogos.map(j => `
+    <tr>
+      <td>${esc(j.titulo)}</td>
+      <td>${esc(j.plataforma)}</td>
+      <td>${brl(j.preco)}</td>
+      <td>${j.estoque}</td>
+      <td>${j.ativo ? "À venda" : "Oculto"}</td>
+      <td>
+        <div class="acoes">
+          <a onclick="ir('jogo_form',{id:${j.id}})">Editar</a>
+          <button type="button" class="link perigo" onclick="excluirJogo(${j.id})">Excluir</button>
+        </div>
+      </td>
+    </tr>
+  `).join("");
+}
+function excluirJogo(id) {
+  if (!confirm("Excluir este jogo?")) return;
+  const jogos = getJogos();
+  const pedidos = getPedidos();
+  const foiVendido = pedidos.some(p => p.itens.some(i => i.jogo_id === id));
+  if (foiVendido) {
+    const idx = jogos.findIndex(j => j.id === id);
+    if (idx >= 0) {
+      jogos[idx].ativo = 0;
+      salvarJogos(jogos);
+      flash("Esse jogo já foi vendido, então foi apenas ocultado do catálogo.");
+    }
+  } else {
+    salvarJogos(jogos.filter(j => j.id !== id));
+    flash("Jogo excluído.");
+  }
+  ir("admin");
+}
+
+
+/* ------------------------------------------------------------
+   3.10) CRIAR / EDITAR JOGO
+------------------------------------------------------------ */
+function renderJogoForm(id) {
+  const user = getUsuarioLogado();
+  if (!user || user.papel !== "admin") {
+    flash("Acesso restrito a administradores.");
+    ir("index");
+    return;
+  }
+  const editando = id !== null;
+  let jogo = { titulo: "", plataforma: "", genero: "", descricao: "", preco: "", estoque: 0, ativo: 1 };
+  if (editando) {
+    const encontrado = getJogos().find(j => j.id === id);
+    if (!encontrado) {
+      flash("Jogo não encontrado.");
+      ir("admin");
+      return;
+    }
+    jogo = encontrado;
+  }
+  document.getElementById("titulo-form").textContent = editando ? "Editar jogo" : "Novo jogo";
+  const form = document.getElementById("form-jogo");
+  form.titulo.value = jogo.titulo || "";
+  form.plataforma.value = jogo.plataforma || "";
+  form.genero.value = jogo.genero || "";
+  form.descricao.value = jogo.descricao || "";
+  form.preco.value = jogo.preco || "";
+  form.estoque.value = jogo.estoque ?? 0;
+  form.ativo.checked = !!jogo.ativo;
+  form.onsubmit = (e) => {
+    e.preventDefault();
+    const fd = new FormData(form);
+    const titulo = (fd.get("titulo") || "").trim();
+    const plataforma = (fd.get("plataforma") || "").trim();
+    const genero = (fd.get("genero") || "").trim();
+    const descricao = (fd.get("descricao") || "").trim();
+    let preco, estoque;
+    try {
+      preco = Math.round(parseFloat(String(fd.get("preco")).replace(",", ".")) * 100) / 100;
+      estoque = parseInt(fd.get("estoque"), 10);
+    } catch {
+      flash("Preço e estoque precisam ser números.");
+      return;
+    }
+    if (!titulo || !plataforma) {
+      flash("Título e plataforma são obrigatórios.");
+      return;
+    }
+    if (!Number.isFinite(preco) || !(preco > 0) || !(estoque >= 0)) {
+      flash("Preço e estoque inválidos.");
+      return;
+    }
+    const ativo = fd.get("ativo") ? 1 : 0;
+    const jogos = getJogos();
+    if (editando) {
+      const idx = jogos.findIndex(j => j.id === id);
+      jogos[idx] = { ...jogos[idx], titulo, plataforma, genero, descricao, preco, estoque, ativo };
+      salvarJogos(jogos);
+      flash("Jogo atualizado.");
+    } else {
+      const novoId = jogos.length ? Math.max(...jogos.map(j => j.id)) + 1 : 1;
+      jogos.push({ id: novoId, titulo, plataforma, genero, descricao, preco, estoque, ativo });
+      salvarJogos(jogos);
+      flash("Jogo cadastrado.");
+    }
+    ir("admin");
+  };
+}
+
+
+/* ------------------------------------------------------------
+   3.11) INICIALIZAÇÃO
+------------------------------------------------------------ */
+document.addEventListener("DOMContentLoaded", () => {
+  ir("index");
+});
+</script>
+</body>
+</html>
